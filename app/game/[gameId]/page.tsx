@@ -3,7 +3,7 @@
 
 
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState} from "react";
 import { useParams } from "next/navigation";
 import { ID } from "appwrite";
 import { client, databases, databaseId, collectionId } from "@/app/appwrite";
@@ -217,7 +217,7 @@ function GameBoard() {
             </div>
             <div className="flex justify-center  m-5">
                 
-                <span>|'_'|</span>
+                <span>{`|'_'|`}</span>
                
             </div>
             {winner && (
