@@ -1,6 +1,9 @@
 
 'use client';
-import { useEffect, useRef, useState } from "react";
+
+
+
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useParams } from "next/navigation";
 import { ID } from "appwrite";
 import { client, databases, databaseId, collectionId } from "@/app/appwrite";
@@ -17,6 +20,7 @@ export default function Game() {
     const channel = `databases.${databaseId}.collections.${collectionId}.documents.${params.gameId}`;
 
     useEffect(() => {
+    
         const playerId = localStorage.getItem("rps-player-id") || ID.unique();
         localStorage.setItem("rps-player-id", playerId);
 
@@ -40,7 +44,7 @@ export default function Game() {
         return () => unsubscribe();
     }, [params.gameId, started]);
 
-    if (!boss) return <h1>Loading...</h1>;
+    if (!boss) return <h1 className="text-center"></h1>;
 
     const isBoss = boss === localStorage.getItem("rps-player-id");
 
@@ -55,6 +59,8 @@ function GameBoard() {
     const [winner, setWinner] = useState<string>('')
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const result = useRef<Array<number>>([])
+
+
     const calWinner = (move1: string, move2: string) => {
         if (move1 == move2) return 0;
         if (
@@ -67,6 +73,8 @@ function GameBoard() {
             return 2
         }
     }
+
+
     const updateChoices = (doc: GameInterface) => {
         const isPlayer1 = doc.player1 === localStorage.getItem("rps-player-id");
         setChoices(isPlayer1 ? doc.move1 : doc.move2);
@@ -124,15 +132,20 @@ function GameBoard() {
 
         fetchGame();
 
-        const unsubscribe = client.subscribe(channel, (response: RealtimeResponseEvent<GameInterface>) =>
-            updateChoices(response.payload)
+        const unsubscribe = client.subscribe(channel, (response: RealtimeResponseEvent<GameInterface>) => {
+                
+                updateChoices(response.payload)
+           
+        }
         );
 
         return () => unsubscribe();
     }, [params.gameId]);
 
     const makeAttempt = async (choice: string) => {
+        
         try {
+    
             const doc = await databases.getDocument<GameInterface>(databaseId, collectionId, params.gameId);
             const isPlayer1 = localStorage.getItem("rps-player-id") === doc.player1;
 
@@ -143,15 +156,19 @@ function GameBoard() {
                 return
             };
 
+            setChoices([...choices, choice])
+
             await databases.updateDocument(databaseId, collectionId, params.gameId, {
                 [movesKey]: [...moves, choice],
             });
         } catch (error) {
             console.error("Error updating move:", error);
+            
+
         }
     };
 
-    if(isLoading) return <h1>Loading ... </h1>
+    if(isLoading) return <h1 className="my-8 text-center">Loading ... </h1>
     // "rock" ? "" : "paper" ? "" : ""
     return (
         <div className="my-48">
@@ -159,6 +176,7 @@ function GameBoard() {
             <div className="flex justify-center items-center space-x-24 my-9">
                 {["rock", "paper", "scissor"].map((choice) => (
                     <button
+                        disabled={choices.length == 3}
                         key={choice}
                         onClick={() => makeAttempt(choice)}
                         className="text-5xl transform transition-transform duration-200 hover:scale-125"
@@ -197,8 +215,10 @@ function GameBoard() {
                 </table>
                 
             </div>
-            <div className="flex justify-center justify-items-center">
+            <div className="flex justify-center  m-5">
                 
+                <span>|'_'|</span>
+               
             </div>
             {winner && (
                 <div className="flex justify-center items-center">

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-
+import Link from "next/link";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -45,7 +45,7 @@ export default function RootLayout({
 const Navbar = () => {
   return (
     <nav className =" h-16 flex items-center justify-items-start">
-      <div className="text-2xl ml-36 font-bold "><span className="text-red-500">R</span><span className="text-yellow-400">P</span><span className="text-green-500">S</span></div>
+      <Link href="/"><div className="text-2xl ml-36 font-bold "><span className="text-red-500">R</span><span className="text-yellow-400">P</span><span className="text-green-500">S</span></div></Link>
     </nav>
   );
 };

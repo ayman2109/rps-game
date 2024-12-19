@@ -1,13 +1,13 @@
 'use client'
 import { ID } from 'appwrite';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { databases } from './appwrite';
 
 export default function Home() {
   const router = useRouter();
-
+  const [load, setLoad] = useState<boolean>(false)
   useEffect(() => {
     // Ensure that player ID is stored in localStorage if it doesn't exist
     if (!localStorage.getItem('rps-player-id')) {
@@ -16,6 +16,7 @@ export default function Home() {
   }, []);
 
   const createNewGame = async () => {
+    setLoad(true)
     try {
       const newGameId = ID.unique(); // Generate a new game ID
       const player1 = localStorage.getItem('rps-player-id'); // Get the player's ID from localStorage
@@ -32,6 +33,8 @@ export default function Home() {
       router.push(`/game/${newGameId}`);
     } catch (error) {
       console.error("Error creating new game:", error);
+    } finally {
+      setLoad(false)
     }
   };
 
@@ -39,7 +42,7 @@ export default function Home() {
     <div className='py-10 m-24 text-center'>
       <h1 className='text-orange-300 text-9xl my-11'>Rock Paper Scissors</h1>
       <button className='text-white rounded-md bg-slate-600 py-6 px-9 text-2xl'onClick={createNewGame}>
-        Start a New Game
+        {load ? 'Starting new game ..... ': 'Start a New Game'}
       </button>
     </div>
   );
